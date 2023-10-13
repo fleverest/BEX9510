@@ -1,2 +1,3 @@
-data/*
-plots/*png
+results/data/*
+results/plots/*
+Rplots.pdf

@@ -1,5 +1,8 @@
+#!/usr/bin/env Rscript
+
 library(ggplot2)
-data <- read.csv2("data/combining_independent_p_and_e_fig1.csv")
+
+data <- read.csv2("results/data/combining_independent_p_and_e_fig1.csv")
 ggplot(
   data,
   aes(
@@ -23,4 +26,4 @@ ggplot(
   scale_y_continuous(
     trans = "log10"
   )
-ggsave("plots/figure_1.png")
+ggsave("results/plots/figure_1.png")

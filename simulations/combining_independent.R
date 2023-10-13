@@ -1,38 +1,15 @@
+#!/usr/bin/env Rscript
+
 # This file replicates the first simulation study in Section 7 of the paper
 # "E-values:Calibration, combination, and applications".
 
 library(reshape2)
 
 #### Calibrators
+source("simulations/lib/calibrate.R")
 
-# The admissible e-to-p calibrator.
-calibrate_e_to_p <- Vectorize(\(e) min(1, 1 / e))
-
-# The p-to-e calibrator obtained by integrating the simple family over κ.
-calibrate_p_to_e <- function(p) (1 - p + p * log(p)) / (p * log(p)^2)
-
-# The Vovke-Sellke bound on the simple family of p-to-e calibrators.
-vs_p <- Vectorize(\(p) if (p <= exp(-1)) -exp(-1) / (p * log(p)) else 1)
-
-# The "approximate" p-to-e callibrator: reciprocal
-reciprocal <- \(p) 1 / p
-
-#### ip-merging
-
-fisher_merge_p <- function(p, log.p = FALSE) {
-  pchisq(
-    -2 * sum(log(p)),
-    df = 2 * length(p),
-    lower.tail = FALSE,
-    log.p = log.p
-  )
-}
-
-simes_merge_p <- function(p) min(sort(p) * length(p) / seq_along(p))
-
-#### dependent p-merging
-
-bonferroni_merge_p <- function(p) min(length(p) * min(p), 1)
+#### merging functions for e-values and p-values
+source("simulations/lib/merge.R")
 
 
 #### e-values
@@ -154,7 +131,7 @@ data <- do.call(
   )
 )
 
-write.csv2(data, "data/combining_independent_p_and_e_fig1.csv", row.names = FALSE)
+write.csv2(data, "results/data/combining_independent_p_and_e_fig1.csv", row.names = FALSE)
 
 # "Global" simulation parameters
 seed <- 987654321
@@ -217,4 +194,8 @@ data <- do.call(
   )
 )
 
-write.csv2(data, "data/combining_independent_p_and_e_fig2.csv", row.names = FALSE)
+write.csv2(
+  data,
+  "results/data/combining_independent_p_and_e_fig2.csv",
+  row.names = FALSE
+)
