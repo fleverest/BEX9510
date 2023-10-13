@@ -1,0 +1,26 @@
+library(ggplot2)
+data <- read.csv2("data/combining_independent_p_and_e_fig2.csv")
+ggplot(
+  data,
+  aes(
+    x = observations,
+    y = p_value,
+    colour = method,
+    fill = method
+  )
+) +
+  stat_summary(
+    fun = median,
+    geom = "line"
+  ) +
+#  stat_summary(
+#    geom = "ribbon",
+#    fun.ymin = \(x) quantile(x, 0.25),
+#    fun.ymax = \(x) quantile(x, 0.75),
+#    alpha = 0.25,
+#    colour = NA
+#  ) +
+  scale_y_continuous(
+    trans = "log10"
+  )
+ggsave("plots/figure_2_pvals.png")
