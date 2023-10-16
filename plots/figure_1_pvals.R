@@ -9,7 +9,8 @@ ggplot(
     x = observations,
     y = p_value,
     colour = method,
-    fill = method
+    fill = method,
+    linetype = bound
   )
 ) +
   stat_summary(

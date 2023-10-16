@@ -2,11 +2,12 @@
 
 library(ggplot2)
 
-data <- read.csv2("results/data/combining_independent_p_and_e_fig1.csv")
+data <- read.csv2("results/data/multiple_hypothesis_testing_fig4.csv")
+
 ggplot(
   data,
   aes(
-    x = observations,
+    x = hypothesis,
     y = e_value,
     colour = method,
     fill = method,
@@ -27,4 +28,4 @@ ggplot(
   scale_y_continuous(
     trans = "log10"
   )
-ggsave("results/plots/figure_1.png")
+ggsave("results/plots/figure_4.png")

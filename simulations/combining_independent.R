@@ -21,7 +21,7 @@ e_product <- function(x, δ) cumprod(dnorm(x, δ, 1) / dnorm(x, 0, 1))
 # Calcualtes e-values using the average of likelihood rations for the simple
 # hypotheses H0 and H1.
 e_average <- function(x, δ) {
-  cumsum(dnorm(x, δ, 1) / dnorm(x, 0 ,1)) / seq_along(x)
+  cumsum(dnorm(x, δ, 1) / dnorm(x, 0, 1)) / seq_along(x)
 }
 
 # Calculates the e-values using the universal test martingale.
@@ -81,8 +81,9 @@ product <- melt(
   )
 )
 names(product) <- c("observations", "simulation_idx", "e_value")
-product[, "method"] <- "product"
+product[, "method"] <- "Product"
 product[, "p_value"] <- calibrate_e_to_p(product[, "e_value"])
+product[, "bound"] <- "Bona fide"
 
 set.seed(seed)
 universal <- melt(
@@ -92,8 +93,9 @@ universal <- melt(
   )
 )
 names(universal) <- c("observations", "simulation_idx", "e_value")
-universal[, "method"] <- "universal"
+universal[, "method"] <- "Universal"
 universal[, "p_value"] <- calibrate_e_to_p(universal[, "e_value"])
+universal[, "bound"] <- "Bona fide"
 
 #### Conduct simulations based on p-values.
 
@@ -107,19 +109,21 @@ p_values <- melt(
   )
 )
 
-# The line labelled "Fisher" employs the approximation of an e-value
+# the line labelled "fisher" employs the approximation of an e-value
 # given by the reciprocal of the p-values.
 fisher <- p_values
 names(fisher) <- c("observations", "simulation_idx", "p_value")
-fisher[, "method"] <- "fisher"
+fisher[, "method"] <- "Fisher"
 fisher[, "e_value"] <- reciprocal(fisher[, "p_value"])
+fisher[, "bound"] <- "Global UB"
 
-# Each value combines the p-values to obtain either an e-value (or a
-# family-wise bound in the case of fisher_VS)
+# each value combines the p-values to obtain either an e-value (or a
+# family-wise bound in the case of fisher_vs)
 fisher_vs <- p_values
 names(fisher_vs) <- c("observations", "simulation_idx", "p_value")
-fisher_vs[, "method"] <- "fisher_vs"
+fisher_vs[, "method"] <- "Fisher VS"
 fisher_vs[, "e_value"] <- vs_p(p_values[, "value"])
+fisher_vs[, "bound"] <- "VS UB"
 
 data <- do.call(
   rbind,
@@ -127,11 +131,17 @@ data <- do.call(
     product,
     universal,
     fisher,
-    fisher_vs
+    fisher_vs,
+    fisher2,
+    fisher2_vs
   )
 )
 
-write.csv2(data, "results/data/combining_independent_p_and_e_fig1.csv", row.names = FALSE)
+write.csv2(
+  data,
+  "results/data/combining_independent_p_and_e_fig1.csv",
+  row.names = FALSE
+)
 
 # "Global" simulation parameters
 seed <- 987654321
@@ -149,8 +159,9 @@ average <- melt(
   )
 )
 names(average) <- c("observations", "simulation_idx", "e_value")
-average[, "method"] <- "average"
+average[, "method"] <- "Average"
 average[, "p_value"] <- calibrate_e_to_p(average[, "e_value"])
+average[, "bound"] <- "Bona fide"
 
 # Simes method
 set.seed(seed)
@@ -161,12 +172,14 @@ simes <- melt(
   )
 )
 names(simes) <- c("observations", "simulation_idx", "p_value")
-simes[, "method"] <- "simes"
+simes[, "method"] <- "Simes"
 simes[, "e_value"] <- reciprocal(simes[, "p_value"])
+simes[, "bound"] <- "Global UB"
 
 simes_vs <- simes
-simes_vs[, "method"] <- "simes_vs"
+simes_vs[, "method"] <- "Simes VS"
 simes_vs[, "e_value"] <- vs_p(simes_vs[, "p_value"])
+simes_vs[, "bound"] <- "VS UB"
 
 set.seed(seed)
 bonferroni <- melt(
@@ -176,12 +189,14 @@ bonferroni <- melt(
   )
 )
 names(bonferroni) <- c("observations", "simulation_idx", "p_value")
-bonferroni[, "method"] <- "bonferroni"
+bonferroni[, "method"] <- "Bonferroni"
 bonferroni[, "e_value"] <- reciprocal(bonferroni[, "p_value"])
+bonferroni[, "bound"] <- "Global UB"
 
 bonferroni_vs <- bonferroni
-bonferroni_vs[, "method"] <- "bonferroni_vs"
+bonferroni_vs[, "method"] <- "Bonferroni VS"
 bonferroni_vs[, "e_value"] <- vs_p(bonferroni_vs[, "p_value"])
+bonferroni_vs[, "bound"] <- "VS UB"
 
 data <- do.call(
   rbind,
