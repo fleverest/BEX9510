@@ -1,0 +1,140 @@
+---
+title: "E-values: A review"
+author: "Floyd Everest"
+format:
+  revealjs:
+    theme: [serif]
+---
+
+
+## 
+
+"**E-values: Calibration, combination and applications**" 
+Vladimir Vovk and Ruodu Wang
+
+* Hypothesis testing!
+
+* **$e$-values:** An alternative to $p$-values
+
+* **Calibration:** Derive $e$-values from $p$-values and vice versa
+
+* **Combination:** Combine multiple values into one
+
+* **Applications:** Election Auditing!
+
+
+## What is a $p$-value? Hypothesis?
+
+![Rigging a coin. Image source: [Mike Izbiki's blog, 2011](https://izbicki.me/)](./images/unfair_coin_izbiki.bmp)
+
+## What is a $p$-value?
+::: {.incremental}
+* "$\text{H}_0$: My coin is fair! $P(\text{Heads})=0.5!$"
+* I flip the coin 10 times
+  - I observe 8 heads, 2 tails.
+  - `pbinom(2, size = 10, prob = 0.5)` $=0.0546875$!
+* This is a really rare result if you're right.
+  - Statistical anomaly?
+  - ... LIES!
+:::
+
+
+## $p$-values
+
+* The probability we calculated is a $p$-value
+* It bounds the probability of the observed event under $\text{H}_0$
+* If an event is rare enough, we have reason to doubt $\text{H}_0$
+  - Traditionally, we reject $\text{H}_0$ if observed event is rarer than 1/20
+  - Significance level $\alpha=.95$
+
+
+## Why are $p$-values so popular?
+
+* $p$-values are useful!
+* Quantifies evidence against the null hypothesis
+* Convenient when null distribution is known
+
+## Formally...
+
+* Null probability measure $Q$
+* A random variable $0\leq P\leq1$ is a *$p$-variable* if:
+ - $\forall \epsilon\in(0,1):\ Q(P \leq \epsilon) \leq \epsilon$
+* Values taken by $P$ are called $p$-values
+* In textbook stats, this is an equality $\Rightarrow$ uniform
+
+## $e$-values
+
+* A random variable $0\leq E\leq \infty$ is an *$e$-variable* if:
+  - $\mathbb{E}^Q(E)\leq1$
+* Intuition: Betting
+  - The bookkeeper believes the null-distribution
+  - If we take advantage of her, we can make some money
+  - $E$ is our bet against their belief.
+  - $e$ is the amount we have multiplied our initial investment by.
+* What if $e < 1$?
+  - We lost money!
+  - Evidence that we are wrong to doubt the null hypothesis!
+
+
+# Intractibility of $p$-values
+
+## Repeated experiments
+
+* What if we can't reject null?
+  - Do the experiment again?
+  - $p$-hacking?? *$e$-hacking*????
+* Make sure to adjust!
+  - Don't be a hacker!
+* But how?
+
+## Multiple testing ($p$-values)
+
+* Fisher's method
+* Requires independent $p$-values - no shared data!
+* If $p$-values are uniformly distributed under $\text{H}_0$:
+  - $-2\text{log}(p_1\cdots p_n) \sim \chi^2(2n)$
+  - Combined $p$-value is the $\chi^2$ quantile
+
+## Multiple testing ($e$-values)
+
+* Independent?
+  - Multiply them!
+  - $e_1\cdots e_n$
+* Dependent?
+  - Arithmetic mean!
+  - $\sum_{i=1}^n e_i$
+
+
+## Testing multiple hypotheses
+
+::: {.incremental}
+
+* Testing efficacy of a new drug against 100 diseases
+* Which diseases can the drug treat?
+* Conduct test for 100 hypotheses:
+  - $\text{H}_0$: The drug has no effect
+  - $\text{H}_1$: The drug effectively treats the disease
+
+:::
+
+## Multiple comparisons
+
+* $p$-values are uniformly distributed under $\text{H}_0$
+* Even if the drug is always ineffective
+ - Expect to reject $\text{H}_0$ $1/\alpha$ times
+ - Using $\alpha = 0.05$, expect to find drug effective against 5 diseases
+ - Too many *Type I errors*
+* $e$-values are not immune either
+
+
+## What do we do?
+
+We need to adjust our $p$-values upward to reduce the 
+* Bonferroni correction
+ - Test each hypothesis at level $\alpha = 0.05/n$
+ - Equivalently, adjust $p$-values by multiplying by $n$.
+* Other methods:
+ - Simes
+ - Holm
+ - Hochberg
+ - ...

@@ -5,6 +5,9 @@
 # The admissible e-to-p calibrator.
 calibrate_e_to_p <- Vectorize(\(e) min(1, 1 / e))
 
+# The p-to-e calibrators in the family f_κ
+f_kappa <- function(p, kappa) kappa * p ^ (kappa - 1)
+
 # The p-to-e calibrator obtained by integrating the simple family over κ.
 calibrate_p_to_e <- function(p) (1 - p + p * log(p)) / (p * log(p)^2)
 
