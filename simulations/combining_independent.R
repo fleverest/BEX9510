@@ -125,6 +125,11 @@ fisher_vs[, "method"] <- "Fisher VS"
 fisher_vs[, "e_value"] <- vs_p(p_values[, "value"])
 fisher_vs[, "bound"] <- "VS UB"
 
+fisher_int <- fisher_vs
+fisher_int[, "bound"] <- "Bona fide"
+fisher_int[, "method"] <- "Fisher Integrated"
+fisher_int[, "e_value"] <- calibrate_p_to_e(p_values[, "value"])
+
 data <- do.call(
   rbind,
   list(
@@ -132,8 +137,7 @@ data <- do.call(
     universal,
     fisher,
     fisher_vs,
-    fisher2,
-    fisher2_vs
+    fisher_int
   )
 )
 

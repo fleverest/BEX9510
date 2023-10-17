@@ -4,13 +4,11 @@ library(ggplot2)
 
 data <- read.csv2("results/data/combining_independent_p_and_e_fig1.csv")
 ggplot(
-  data,
+  data[data[, "method"] == "Fisher" | data[, "method"] == "Product" | data[, "method"] == "Universal" ,],
   aes(
     x = observations,
     y = p_value,
-    colour = method,
-    fill = method,
-    linetype = bound
+    colour = method
   )
 ) +
   stat_summary(
@@ -27,4 +25,10 @@ ggplot(
   scale_y_continuous(
     trans = "log10"
   )
-ggsave("results/plots/figure_1_pvals.png")
+ggsave(
+  "results/plots/figure_1_pvals.png",
+  width = 11,
+  height = 8,
+  units = "in",
+  device = "png"
+)

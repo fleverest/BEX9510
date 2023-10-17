@@ -26,4 +26,10 @@ ggplot(
   scale_y_continuous(
     trans = "log10"
   )
-ggsave("results/plots/figure_2.png")
+ggsave(
+  "results/plots/figure_2.png",
+  width = 11,
+  height = 8,
+  units = "in",
+  device = "png"
+)

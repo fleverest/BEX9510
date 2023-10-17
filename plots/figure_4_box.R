@@ -5,8 +5,7 @@ library(ggplot2)
 data <- read.csv2("results/data/multiple_hypothesis_testing_fig4.csv")
 
 ggplot(
-# Remove product
-  data[data[, "method"] != "Product"],
+  data[data[, "method"] != "Product", ],
   aes(
     x = hypothesis < 100,
     y = e_value,
@@ -29,5 +28,12 @@ ggplot(
 #  ) +
   scale_y_continuous(
     trans = "log10"
-  )
-ggsave("results/plots/figure_4_box.png")
+  ) +
+  xlab("Generated from alternative")
+ggsave(
+  "results/plots/figure_4_box.png",
+  width = 11,
+  height = 8,
+  units = "in",
+  device = "png"
+)

@@ -28,5 +28,12 @@ ggplot(
 #  ) +
   scale_y_continuous(
     trans = "log10"
-  )
-ggsave("results/plots/figure_3_box.png")
+  ) +
+  xlab("Generated from alternative")
+ggsave(
+  "results/plots/figure_3_box.png",
+  width = 11,
+  height = 8,
+  units = "in",
+  device = "png"
+)
