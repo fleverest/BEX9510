@@ -4,6 +4,7 @@ author: "Floyd Everest"
 format:
   revealjs:
     theme: [serif]
+    chalkboard: true
 ---
 
 
@@ -28,15 +29,17 @@ Vladimir Vovk and Ruodu Wang
 ![Rigging a coin. Image source: [Mike Izbiki's blog, 2011](https://izbicki.me/)](./images/unfair_coin_izbiki.bmp)
 
 ## What is a $p$-value?
-::: {.incremental}
 * "$\text{H}_0$: My coin is fair! $P(\text{Heads})=0.5!$"
+* I think $\text{H}_1$: $P(\text{Heads}) > 0.5!$
 * I flip the coin 10 times
   - I observe 8 heads, 2 tails.
   - `pbinom(2, size = 10, prob = 0.5)` $=0.0546875$!
 * This is a really rare result if you're right.
-  - Statistical anomaly?
-  - ... LIES!
-:::
+* Statistical anomaly?
+
+. . .
+
+- LIES!
 
 
 ## $p$-values
@@ -64,19 +67,18 @@ Vladimir Vovk and Ruodu Wang
 
 ## $e$-values
 
-* A random variable $0\leq E\leq \infty$ is an *$e$-variable* if:
-  - $\mathbb{E}^Q(E)\leq1$
-* Intuition: Betting
+A random variable $0\leq E\leq \infty$ is an *$e$-variable* if $\mathbb{E}^Q(E)\leq1$
+
+* Betting interpretation:
   - The bookkeeper believes the null-distribution
   - If we take advantage of her, we can make some money
-  - $E$ is our bet against their belief.
-  - $e$ is the amount we have multiplied our initial investment by.
-* What if $e < 1$?
-  - We lost money!
-  - Evidence that we are wrong to doubt the null hypothesis!
+  - $E$ represents our bet
+  - $e$ is the amount we have multiplied our initial investment by
+* What if we lose money?
+  - Evidence *in favour* of null hypothesis
 
 
-# Intractibility of $p$-values
+# Combination: Intractibility of $p$
 
 ## Repeated experiments
 
@@ -97,17 +99,13 @@ Vladimir Vovk and Ruodu Wang
 
 ## Multiple testing ($e$-values)
 
-* Independent?
-  - Multiply them!
-  - $e_1\cdots e_n$
+* Independent? *Sequential?*
+  - Take the product
 * Dependent?
-  - Arithmetic mean!
-  - $\sum_{i=1}^n e_i$
+  - Take the mean
 
 
 ## Testing multiple hypotheses
-
-::: {.incremental}
 
 * Testing efficacy of a new drug against 100 diseases
 * Which diseases can the drug treat?
@@ -115,9 +113,7 @@ Vladimir Vovk and Ruodu Wang
   - $\text{H}_0$: The drug has no effect
   - $\text{H}_1$: The drug effectively treats the disease
 
-:::
-
-## Multiple comparisons
+## Multiple comparisons problem
 
 * $p$-values are uniformly distributed under $\text{H}_0$
 * Even if the drug is always ineffective
@@ -129,12 +125,81 @@ Vladimir Vovk and Ruodu Wang
 
 ## What do we do?
 
-We need to adjust our $p$-values upward to reduce the 
-* Bonferroni correction
- - Test each hypothesis at level $\alpha = 0.05/n$
- - Equivalently, adjust $p$-values by multiplying by $n$.
-* Other methods:
- - Simes
- - Holm
- - Hochberg
- - ...
+* We have a few methods for combining multiple $p$-values into one
+  - Holm-Bonferroni correction (no dependence assumption)
+  - Simes' (either independent or positively dependent)
+  - A bajillion other methods
+* Just take the average of $e$-values
+
+## How to adjust per-hypothesis?
+
+* Testing each hypothesis requires one $p$ or $e$ each
+* Computationally intensive way:
+  - For each hypothesis $\text{H}_i,\ i=1,\dots,n$
+  - Check every subset of hypotheses $\{\text{H}_1,\dots,\text{H}_n\}$ containing $\text{H}_i$
+  - Use the largest combined $p$-value of these subsets
+  - Smallest average $e$-value
+* Computational shortcuts can approximate in $\mathcal{O}(n^2)$ time
+
+# Calibration: $p$-to-$e$ and $e$-to-$p$
+
+## $e$-to-$p$ Calibration
+
+* $e$-variables are nonnegative
+* Markov's inequality:
+  - $\Rightarrow Q(E \geq a) \leq \frac{1}{a}$, for any $a>0$
+  - $\Rightarrow Q(\frac{1}{E} \leq \frac{1}{a}) \leq \frac{1}{a}$
+  - $\Rightarrow Q(\frac{1}{E} \leq \epsilon) \leq \epsilon$, for $\epsilon>0$.
+* So we can transform $e \rightarrow min(1, 1/e)$
+
+## $p$-to-$e$ Calibration
+
+* Not quite as easy as $1/p$.
+* The family of functions $f_\kappa(p) = \kappa p^{\kappa - 1}$ work for $\kappa \in (0,1)$.
+  - Upper bound has a closed form: $VS(p) = max_\kappa f_\kappa(p) = max(1, \frac{-1}{e p log(p)})$
+* Integrate over $\kappa$: $F(p) = \int_0^1\kappa p^{\kappa-1} d\kappa = \frac{1 - p + p log(p)}{p(log(p))^2}$.
+* Possibly many more...
+
+# Experimental results
+
+## Multiple tests, single hypothesis
+
+![$e$-values by combining multiple tests of a single hypothesis](./images/figure_1.png)
+
+## Multiple tests, single hypothesis
+
+![The same picture but with $p$-values (flipped upside down)](./images/figure_1_pvals.png)
+
+## Multiple tests, single hypothesis
+
+![Methods which don't use independence or sequentiality are bad](./images/figure_2.png)
+
+## Multiple hypotheses
+
+![$e$-values by adjusting to control FWER](./images/figure_3.png)
+
+## Multiple hypotheses
+
+![$e$-values by adjusting to control FWER](./images/figure_3_box.png)
+
+## Multiple hypotheses
+
+![*Sorted* $e$-values by adjusting to control FWER](./images/figure_3_sorted.png)
+
+# Statistical Election Auditing
+
+## Post-election audits
+
+- An election has taken place
+- Officials report that candidate $w\in C$ has won
+- Want to verify that no other candidate $c \in C$ should have won
+
+## A hypothesis test
+
+- $\text{H}_0$: The reported outcome is incorrect
+- $\text{H}_1$: The reported outcome is correct
+
+. . .
+
+- Composite null: one hypothesis $\text{H}_{0,c}$ for each $c\in C\setminus\{w\}$
+  * $\text{H}_{0,c}$: Candidate $c$ should have won
